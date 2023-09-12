@@ -110,32 +110,27 @@ export default function App() {
   }
 
   // Join the room with the generated token
-  const joinRoom = () => {
+  const joinRoom = async () => {
     if (!callObject) {
       return;
     }
 
     console.log(room);
 
-    callObject
-      .join({
-        // Replace with your own room url
-        url: `https://${room}`,
-      })
-      .catch((err) => {
-        console.error("Error joining room:", err);
-      });
+    await callObject.join({
+      // Replace with your own room url
+      url: "https://chris-1.daily.co/test-9-11-23",
+    });
+
+    callObject.startRecording({});
     console.log("joined!");
   };
 
-  const startCamera = () => {
+  const startCamera = async () => {
     if (!callObject) {
       return;
     }
-
-    callObject.startCamera().then((res) => {
-      console.log("startCamera: ", res);
-    });
+    await callObject.startCamera();
   };
 
   const load = () => {
@@ -143,7 +138,7 @@ export default function App() {
       return;
     }
     callObject.load({
-      url: `https://${room}`,
+      url: `https://chris-1.daily.co/test-9-11-23`,
     });
   };
 
@@ -152,7 +147,7 @@ export default function App() {
       return;
     }
     callObject.preAuth({
-      url: `https://${room}`,
+      url: `https://chris-1.daily.co/test-9-11-23`,
     });
   };
 
@@ -183,6 +178,7 @@ export default function App() {
     if (!callObject) {
       return;
     }
+    callObject.stopRecording();
     callObject.leave().catch((err) => {
       console.error("Error leaving room:", err);
     });
