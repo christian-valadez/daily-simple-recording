@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Daily, {
   DailyEventObject,
   DailyEventObjectCameraError,
@@ -21,6 +21,7 @@ import {
 } from "@daily-co/daily-react";
 
 import "./styles.css";
+import { getVCSConfig } from "./utils";
 
 console.info("Daily version: %s", Daily.version());
 console.info("Daily supported Browser:");
@@ -122,7 +123,7 @@ export default function App() {
       url: "https://chris-1.daily.co/test-9-11-23",
     });
 
-    callObject.startRecording({});
+    callObject.startRecording(getVCSConfig());
     console.log("joined!");
   };
 
@@ -169,8 +170,23 @@ export default function App() {
     });
   };
 
+  const remoteParticipants = useParticipantIds({ filter: "remote" });
   const updateParticipant = (evt: DailyEventObjectParticipant) => {
+    if (!callObject) return;
+    if (!remoteParticipants.length) return;
+
     console.log("Participant updated: ", evt);
+    const allParticipants = Object.values(callObject.participants());
+    const activeParticipant = allParticipants
+      .filter((p) => !p.local)
+      .find(
+        (p) =>
+          p.tracks.video.state === "playable" &&
+          p.tracks.audio.state === "playable" &&
+          remoteParticipants.includes(p.session_id)
+      );
+    console.log(allParticipants, activeParticipant);
+    callObject.updateRecording(getVCSConfig(activeParticipant));
   };
 
   // Remove video elements and leave the room
